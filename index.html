@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+    
+</head>
+<script>
+    var keys;
+    window.onload = async () => {
+        console.log("load");
+        keys = JSON.parse(localStorage.getItem('keymetadata'));
+
+        if (!keys) {
+            let data = await fetch('data/keyboard.json');
+            keys = await data.json();
+            localStorage.setItem('keymetadata', JSON.stringify(keys))
+            console.log(keys);
+        }
+        keyboard = ''
+        keys.forEach(element => {
+            keyboard += `<div class="keyboard__row">`;
+            element.forEach(d => {
+                if (d['size']) {
+                    keyboard += `<div data-key-code="${d.code}" style="--key-size: ${d['size']}" data-key-display="${d.key}" class="key"></div>`;
+                } else {
+                    keyboard += `<div data-key-code="${d.code}" data-key-display="${d.key}" class="key"></div>`;
+                }
+            })
+            keyboard += `</div>`
+        });
+
+        document.getElementById('keyboard').innerHTML = keyboard;
+    }
+    var keys = [];
+    window.onkeydown = (e) => {
+        console.log(e.keyCode)
+        console.log(e)
+        console.log(document.querySelector(`[data-key-code="${e.code}"]`), e);
+        document.querySelector(`[data-key-code="${e.code}"]`).classList.add('active');
+        // if (keys.filter(k => k.keyCode == e.keyCode).length == 0)
+        //     keys.push({ key: e.key, keyCode: e.keyCode, code: e.code })
+    }
+
+    window.onkeyup = (e) => {
+        console.log(e.keyCode)
+        console.log(document.querySelector(`[data-key-code="${e.code}"]`), e);
+        document.querySelector(`[data-key-code="${e.code}"]`).classList.remove('active');
+        // console.log(keys);
+    }
+    function keyboardColorSelection(color) {
+        console.log(color);
+        keyboard = ""
+        keys.forEach(element => {
+            keyboard += `<div class="keyboard__row">`;
+            element.forEach(d => {
+                if (d['size']) {
+                    keyboard += `<div data-key-code="${d.code}" style="--key-size: ${d['size']}; --key-background: ${color}; --key-background-on-active: #000" data-key-display="${d.key}" class="key"></div>`;
+                } else {
+                    keyboard += `<div data-key-code="${d.code}" data-key-display="${d.key}" style=" --key-background-on-active: #000" class="key"></div>`;
+                }
+            })
+            keyboard += `</div>`
+        });
+        document.getElementById('keyboard').innerHTML = keyboard;
+    }
+</script>
+
+<body>
+    <div class="color-picker">
+        <div class="colors-theme" style="--key-color-theme:#03A9F4;" onclick="keyboardColorSelection('#03A9F4')">
+        </div>
+        <div class="colors-theme" style="--key-color-theme:#009688;" onclick="keyboardColorSelection('#009688')">
+        </div>
+        <div class="colors-theme" style="--key-color-theme:#F44336;" onclick="keyboardColorSelection('#F44336')">
+        </div>
+        <div class="colors-theme" style="--key-color-theme:#8bc34a;" onclick="keyboardColorSelection('#8bc34a')">
+        </div>
+    </div>
+    <div class="keyboard" id="keyboard">
+    </div>
+</body>
+
+</html>
